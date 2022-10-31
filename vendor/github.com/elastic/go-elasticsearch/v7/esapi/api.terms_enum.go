@@ -15,12 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 //
-// Code generated from specification version 7.16.0: DO NOT EDIT
+// Code generated from specification version 7.17.7: DO NOT EDIT
 
 package esapi
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"strings"
@@ -41,11 +42,9 @@ func newTermsEnumFunc(t Transport) TermsEnum {
 // TermsEnum the terms enum API  can be used to discover terms in the index that begin with the provided string. It is designed for low-latency look-ups used in auto-complete scenarios.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/search-terms-enum.html.
-//
 type TermsEnum func(index []string, o ...func(*TermsEnumRequest)) (*Response, error)
 
 // TermsEnumRequest configures the Terms Enum API request.
-//
 type TermsEnumRequest struct {
 	Index []string
 
@@ -62,7 +61,6 @@ type TermsEnumRequest struct {
 }
 
 // Do executes the request and returns response or error.
-//
 func (r TermsEnumRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
@@ -71,6 +69,10 @@ func (r TermsEnumRequest) Do(ctx context.Context, transport Transport) (*Respons
 	)
 
 	method = "POST"
+
+	if len(r.Index) == 0 {
+		return nil, errors.New("index is required and cannot be nil or empty")
+	}
 
 	path.Grow(1 + len(strings.Join(r.Index, ",")) + 1 + len("_terms_enum"))
 	path.WriteString("/")
@@ -109,10 +111,6 @@ func (r TermsEnumRequest) Do(ctx context.Context, transport Transport) (*Respons
 		req.URL.RawQuery = q.Encode()
 	}
 
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
-	}
-
 	if len(r.Header) > 0 {
 		if len(req.Header) == 0 {
 			req.Header = r.Header
@@ -123,6 +121,10 @@ func (r TermsEnumRequest) Do(ctx context.Context, transport Transport) (*Respons
 				}
 			}
 		}
+	}
+
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if ctx != nil {
@@ -144,7 +146,6 @@ func (r TermsEnumRequest) Do(ctx context.Context, transport Transport) (*Respons
 }
 
 // WithContext sets the request context.
-//
 func (f TermsEnum) WithContext(v context.Context) func(*TermsEnumRequest) {
 	return func(r *TermsEnumRequest) {
 		r.ctx = v
@@ -152,7 +153,6 @@ func (f TermsEnum) WithContext(v context.Context) func(*TermsEnumRequest) {
 }
 
 // WithBody - field name, string which is the prefix expected in matching terms, timeout and size for max number of results.
-//
 func (f TermsEnum) WithBody(v io.Reader) func(*TermsEnumRequest) {
 	return func(r *TermsEnumRequest) {
 		r.Body = v
@@ -160,7 +160,6 @@ func (f TermsEnum) WithBody(v io.Reader) func(*TermsEnumRequest) {
 }
 
 // WithPretty makes the response body pretty-printed.
-//
 func (f TermsEnum) WithPretty() func(*TermsEnumRequest) {
 	return func(r *TermsEnumRequest) {
 		r.Pretty = true
@@ -168,7 +167,6 @@ func (f TermsEnum) WithPretty() func(*TermsEnumRequest) {
 }
 
 // WithHuman makes statistical values human-readable.
-//
 func (f TermsEnum) WithHuman() func(*TermsEnumRequest) {
 	return func(r *TermsEnumRequest) {
 		r.Human = true
@@ -176,7 +174,6 @@ func (f TermsEnum) WithHuman() func(*TermsEnumRequest) {
 }
 
 // WithErrorTrace includes the stack trace for errors in the response body.
-//
 func (f TermsEnum) WithErrorTrace() func(*TermsEnumRequest) {
 	return func(r *TermsEnumRequest) {
 		r.ErrorTrace = true
@@ -184,7 +181,6 @@ func (f TermsEnum) WithErrorTrace() func(*TermsEnumRequest) {
 }
 
 // WithFilterPath filters the properties of the response body.
-//
 func (f TermsEnum) WithFilterPath(v ...string) func(*TermsEnumRequest) {
 	return func(r *TermsEnumRequest) {
 		r.FilterPath = v
@@ -192,7 +188,6 @@ func (f TermsEnum) WithFilterPath(v ...string) func(*TermsEnumRequest) {
 }
 
 // WithHeader adds the headers to the HTTP request.
-//
 func (f TermsEnum) WithHeader(h map[string]string) func(*TermsEnumRequest) {
 	return func(r *TermsEnumRequest) {
 		if r.Header == nil {
@@ -205,7 +200,6 @@ func (f TermsEnum) WithHeader(h map[string]string) func(*TermsEnumRequest) {
 }
 
 // WithOpaqueID adds the X-Opaque-Id header to the HTTP request.
-//
 func (f TermsEnum) WithOpaqueID(s string) func(*TermsEnumRequest) {
 	return func(r *TermsEnumRequest) {
 		if r.Header == nil {
